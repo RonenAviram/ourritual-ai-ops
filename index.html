@@ -46,13 +46,24 @@
   }
 
   .header-label {
-    font-family: 'Inter', sans-serif;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 2.5px;
-    text-transform: uppercase;
-    color: var(--gold);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
     margin-bottom: 16px;
+  }
+
+  .header-label img {
+    height: 28px;
+    width: auto;
+  }
+
+  .header-label span {
+    font-family: 'Inter', sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    color: var(--brown);
   }
 
   .header h1 {
@@ -490,7 +501,10 @@
 
   <!-- Header -->
   <header class="header">
-    <div class="header-label">OurRitual</div>
+    <div class="header-label">
+      <img src="https://cdn.prod.website-files.com/66795ddeb96a1c2a7d52b76f/668553b4c13cf86eb6496b48_OurRitual%20Logomark%20-%20favicon.png" alt="OurRitual">
+      <span>OurRitual</span>
+    </div>
     <h1>Expert Network as the Growth Engine</h1>
     <div class="header-meta">Ronen Aviram &middot; AI Operations Lead &middot; June 2026</div>
   </header>
