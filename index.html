@@ -367,6 +367,109 @@
     margin: 0;
   }
 
+  /* ── Technical Deep Dive ── */
+  .deep-dive-toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 24px;
+    padding: 10px 0;
+    background: none;
+    border: none;
+    font-family: 'Inter', sans-serif;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--gold);
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+  .deep-dive-toggle:hover { color: var(--brown); }
+  .deep-dive-toggle .arrow {
+    display: inline-block;
+    transition: transform 0.3s;
+    font-size: 12px;
+  }
+  .deep-dive-toggle.open .arrow { transform: rotate(90deg); }
+
+  .deep-dive-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease, opacity 0.4s ease;
+    opacity: 0;
+  }
+  .deep-dive-content.open {
+    max-height: 2000px;
+    opacity: 1;
+  }
+
+  .deep-dive-inner {
+    margin-top: 20px;
+    padding: 24px;
+    background: var(--cream);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+  }
+
+  .deep-dive-inner h3 {
+    font-family: 'Playfair Display', serif;
+    font-size: 18px;
+    color: var(--brown);
+    margin: 0 0 6px 0;
+  }
+
+  .deep-dive-inner .dd-subtitle {
+    font-size: 13px;
+    color: var(--brown-light);
+    margin-bottom: 20px;
+  }
+
+  .architecture-tree {
+    font-family: 'JetBrains Mono', 'Fira Code', 'Courier New', monospace;
+    font-size: 12.5px;
+    line-height: 2;
+    color: var(--brown);
+    overflow-x: auto;
+  }
+
+  .architecture-tree .folder {
+    font-weight: 600;
+    color: var(--brown);
+  }
+
+  .architecture-tree .desc {
+    font-family: 'Inter', sans-serif;
+    font-size: 12px;
+    color: var(--brown-light);
+    font-style: italic;
+  }
+
+  .dd-stats {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+  }
+
+  .dd-stat {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+  }
+
+  .dd-stat-num {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+
+  .dd-stat-label {
+    font-size: 12px;
+    color: var(--brown-light);
+  }
+
   /* ── Responsive ── */
   @media (max-width: 600px) {
     .page { padding: 40px 20px 60px; }
@@ -376,6 +479,8 @@
     .dashboard-preview { flex-direction: column; text-align: center; }
     .preview-stats { grid-template-columns: 1fr 1fr; }
     .features { grid-template-columns: 1fr; }
+    .architecture-tree { font-size: 11px; }
+    .dd-stats { gap: 12px; }
   }
 </style>
 </head>
@@ -562,10 +667,59 @@
           Download Overlay Package <span class="cta-arrow">&darr;</span>
         </a>
       </div>
+
+      <!-- Technical Deep Dive -->
+      <button class="deep-dive-toggle" onclick="toggleDeepDive(this)">
+        <span class="arrow">&#9654;</span> For the technically curious — how this was built
+      </button>
+      <div class="deep-dive-content" id="deepDive">
+        <div class="deep-dive-inner">
+          <h3>Architecture Overview</h3>
+          <p class="dd-subtitle">A Claude Desktop methodology folder — every component is purpose-built for the retention workflow</p>
+
+          <div class="architecture-tree">
+            <span class="folder">.claude/</span><br>
+            ├── <span class="folder">CLAUDE.md</span> <span class="desc">— Methodology brain: defines the 5-phase cycle, data simulation rules, and behavioral constraints</span><br>
+            ├── <span class="folder">skills/</span> <span class="desc">— 7 specialized modules, each a self-contained capability:</span><br>
+            │&nbsp;&nbsp; ├── intelligence-gathering <span class="desc">— Cross-references CRM, platform, and session data per therapist</span><br>
+            │&nbsp;&nbsp; ├── risk-assessment <span class="desc">— Scores churn probability across 5 weighted dimensions</span><br>
+            │&nbsp;&nbsp; ├── intervention-plan <span class="desc">— Generates a personalized talk-track for the retention conversation</span><br>
+            │&nbsp;&nbsp; ├── conversation-debrief <span class="desc">— Processes call outcomes and updates the risk model</span><br>
+            │&nbsp;&nbsp; ├── followup-loop <span class="desc">— Tracks commitments, schedules check-ins, measures recovery</span><br>
+            │&nbsp;&nbsp; ├── data-simulation <span class="desc">— Generates realistic therapist data when live systems aren't connected</span><br>
+            │&nbsp;&nbsp; └── phase-enforcement <span class="desc">— Ensures human approval between phases (no autonomous escalation)</span><br>
+            ├── <span class="folder">agents/</span> <span class="desc">— 2 sub-agents for compute-heavy tasks:</span><br>
+            │&nbsp;&nbsp; ├── risk-scoring-agent <span class="desc">— Dedicated risk computation engine with weighted formula</span><br>
+            │&nbsp;&nbsp; └── debrief-analysis-agent <span class="desc">— Post-conversation sentiment and outcome analysis</span><br>
+            ├── <span class="folder">commands/</span> <span class="desc">— Quick-start entry points:</span><br>
+            │&nbsp;&nbsp; ├── /retention-start <span class="desc">— Begin a new case from a name and a feeling</span><br>
+            │&nbsp;&nbsp; ├── /retention-status <span class="desc">— Check progress on active cases</span><br>
+            │&nbsp;&nbsp; └── /retention-end <span class="desc">— Close a case with outcome documentation</span><br>
+            ├── <span class="folder">references/</span> <span class="desc">— Domain knowledge:</span><br>
+            │&nbsp;&nbsp; └── churn-indicators <span class="desc">— 5 archetypes (Frustrated Operator, Neglected Partner, Outgrowing Practitioner, Burned Out, Price Sensitive)</span><br>
+            └── <span class="folder">templates/</span> <span class="desc">— Structured output formats for each phase deliverable</span>
+          </div>
+
+          <div class="dd-stats">
+            <div class="dd-stat"><span class="dd-stat-num">7</span><span class="dd-stat-label">Skills</span></div>
+            <div class="dd-stat"><span class="dd-stat-num">2</span><span class="dd-stat-label">Sub-Agents</span></div>
+            <div class="dd-stat"><span class="dd-stat-num">3</span><span class="dd-stat-label">Commands</span></div>
+            <div class="dd-stat"><span class="dd-stat-num">5</span><span class="dd-stat-label">Churn Archetypes</span></div>
+            <div class="dd-stat"><span class="dd-stat-num">5</span><span class="dd-stat-label">Phase Gates</span></div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
 </div>
+
+<script>
+function toggleDeepDive(btn) {
+  btn.classList.toggle('open');
+  document.getElementById('deepDive').classList.toggle('open');
+}
+</script>
 
 </body>
 </html>
