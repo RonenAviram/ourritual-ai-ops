@@ -1,0 +1,983 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OurRitual — Expert Network Dashboard</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400&family=Inter:wght@300;400;500;600&display=swap');
+
+  :root {
+    --gold: #C4973B;
+    --gold-light: #E8D5A3;
+    --gold-bg: #F5EDD6;
+    --gold-muted: #D4B978;
+    --olive: #5C6B3C;
+    --olive-dark: #3D4A28;
+    --olive-light: #8A9B6A;
+    --cream: #FAF6ED;
+    --cream-dark: #F0E8D4;
+    --brown: #3B2F20;
+    --brown-mid: #5A4A38;
+    --brown-light: #8A7D6E;
+    --red-alert: #B33A2B;
+    --orange-warn: #C47028;
+    --bg: #F8F5EE;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--brown);
+    min-height: 100vh;
+  }
+
+  /* ── Masthead ── */
+  .masthead {
+    background: var(--cream);
+    border-bottom: 1px solid var(--gold-light);
+    padding: 20px 48px 0;
+  }
+  .masthead-top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding-bottom: 18px;
+  }
+  .masthead h1 {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 26px;
+    font-weight: 500;
+    color: var(--brown);
+    letter-spacing: -0.3px;
+  }
+  .masthead h1 span {
+    color: var(--gold);
+  }
+  .masthead-meta {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    font-size: 12px;
+    color: var(--brown-light);
+  }
+  .sim-badge {
+    background: var(--gold-bg);
+    color: var(--gold);
+    font-size: 10px;
+    font-weight: 600;
+    padding: 4px 12px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 1.2px;
+    border: 1px solid var(--gold-light);
+  }
+  .masthead-rule {
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(to right, var(--gold), var(--gold-light), transparent);
+    margin-bottom: 0;
+  }
+
+  /* ── Navigation ── */
+  .nav-bar {
+    display: flex;
+    gap: 0;
+    background: var(--cream);
+    padding: 0 48px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .nav-tab {
+    padding: 12px 28px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: var(--brown-light);
+    border-bottom: 2px solid transparent;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+  .nav-tab:hover { color: var(--brown); }
+  .nav-tab.active {
+    color: var(--brown);
+    border-bottom-color: var(--gold);
+    font-weight: 600;
+  }
+
+  /* ── Exec Tab Nudge (on tab) ── */
+  .nav-tab.has-nudge {
+    animation: tabGlow 2.5s ease-in-out infinite;
+    background: var(--gold-bg);
+    color: var(--brown);
+    font-weight: 600;
+    border-bottom: 2px solid var(--gold);
+  }
+  @keyframes tabGlow {
+    0%, 100% { background: var(--cream); }
+    50% { background: var(--gold-bg); }
+  }
+  .nav-tab .nudge-inline {
+    display: inline-block;
+    margin-left: 8px;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    color: var(--gold);
+    vertical-align: middle;
+  }
+
+  /* ── Floating Corner CTA ── */
+  .exec-float-cta {
+    position: fixed;
+    bottom: 32px;
+    right: 32px;
+    background: var(--brown);
+    color: var(--gold-light);
+    padding: 16px 24px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(59,47,32,0.3);
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    opacity: 0;
+    transform: translateY(20px);
+    animation: floatIn 0.4s ease 3s forwards;
+    transition: transform 0.2s, box-shadow 0.2s;
+    z-index: 100;
+  }
+  .exec-float-cta:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(59,47,32,0.4);
+  }
+  .exec-float-cta .cta-pulse {
+    width: 10px; height: 10px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: ctaDotPulse 1.8s ease-in-out infinite;
+  }
+  @keyframes floatIn {
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes ctaDotPulse {
+    0%, 100% { box-shadow: 0 0 0 0 rgba(196,151,59,0.6); }
+    50% { box-shadow: 0 0 0 8px rgba(196,151,59,0); }
+  }
+  .exec-float-cta.hidden { display: none; }
+
+  /* ── Content ── */
+  .content { padding: 32px 48px; max-width: 1440px; margin: 0 auto; }
+  .view { display: none; }
+  .view.active { display: block; animation: fadeUp 0.35s ease; }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ── Section Headers (Editorial) ── */
+  .section-header {
+    font-family: 'Playfair Display', Georgia, serif;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--brown);
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--cream-dark);
+  }
+  .section-header em {
+    font-style: italic;
+    color: var(--brown-mid);
+    font-weight: 400;
+  }
+
+  /* ── Cards (Editorial) ── */
+  .card {
+    background: white;
+    border-radius: 4px;
+    padding: 24px 28px;
+    border: 1px solid var(--cream-dark);
+  }
+  .card-label {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--brown-light);
+    margin-bottom: 14px;
+    font-weight: 500;
+  }
+
+  /* ── OPS VIEW ── */
+  .ops-pulse {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .pulse-card {
+    text-align: center;
+    padding: 28px 24px;
+  }
+  .pulse-number {
+    font-family: 'Playfair Display', serif;
+    font-size: 44px;
+    font-weight: 600;
+    line-height: 1;
+  }
+  .pulse-label {
+    font-size: 13px;
+    color: var(--brown-light);
+    margin-top: 8px;
+  }
+  .pulse-red .pulse-number { color: var(--red-alert); }
+  .pulse-orange .pulse-number { color: var(--orange-warn); }
+  .pulse-green .pulse-number { color: var(--olive); }
+
+  .ops-body {
+    display: grid;
+    grid-template-columns: 1.55fr 1fr;
+    gap: 24px;
+  }
+
+  /* Therapist rows */
+  .therapist-list { display: flex; flex-direction: column; gap: 2px; }
+  .therapist-row {
+    display: grid;
+    grid-template-columns: 44px 1fr auto;
+    gap: 16px;
+    align-items: center;
+    padding: 16px 20px;
+    background: var(--cream);
+    border-left: 3px solid transparent;
+    transition: background 0.15s;
+  }
+  .therapist-row:first-child { border-radius: 4px 4px 0 0; }
+  .therapist-row:last-child { border-radius: 0 0 4px 4px; }
+  .therapist-row:hover { background: var(--gold-bg); }
+  .therapist-row.severity-high { border-left-color: var(--red-alert); }
+  .therapist-row.severity-med { border-left-color: var(--orange-warn); }
+  .therapist-row.severity-low { border-left-color: var(--gold-muted); }
+
+  .health-score {
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; font-weight: 600; color: white;
+    font-family: 'Playfair Display', serif;
+  }
+  .hs-red { background: var(--red-alert); }
+  .hs-orange { background: var(--orange-warn); }
+  .hs-yellow { background: var(--gold); }
+
+  .therapist-info h4 {
+    font-family: 'Playfair Display', serif;
+    font-size: 15px;
+    font-weight: 500;
+    margin-bottom: 3px;
+  }
+  .therapist-trigger { font-size: 12px; color: var(--brown-light); line-height: 1.5; }
+  .therapist-trigger strong { color: var(--red-alert); font-weight: 500; }
+  .therapist-action {
+    font-size: 11px;
+    background: var(--olive);
+    color: white;
+    padding: 7px 14px;
+    border-radius: 3px;
+    white-space: nowrap;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+  }
+
+  /* Journey distribution */
+  .journey-segment {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+    gap: 14px;
+  }
+  .journey-label {
+    font-size: 12px;
+    width: 90px;
+    font-weight: 500;
+    color: var(--brown-mid);
+  }
+  .journey-bar-bg {
+    flex: 1;
+    height: 24px;
+    background: var(--cream);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .journey-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    display: flex;
+    align-items: center;
+    padding-left: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    color: white;
+    transition: width 0.8s ease;
+  }
+  .journey-bar-fill.intake { background: var(--gold); }
+  .journey-bar-fill.growth { background: var(--olive); }
+  .journey-bar-fill.retention { background: var(--brown-mid); }
+  .journey-bar-fill.at-risk { background: var(--red-alert); }
+
+  /* Triggers feed */
+  .trigger-item {
+    display: flex;
+    gap: 12px;
+    padding: 11px 0;
+    border-bottom: 1px solid var(--cream);
+    font-size: 13px;
+    line-height: 1.5;
+  }
+  .trigger-item:last-child { border-bottom: none; }
+  .trigger-time {
+    color: var(--brown-light);
+    font-size: 11px;
+    white-space: nowrap;
+    min-width: 56px;
+    font-variant-numeric: tabular-nums;
+  }
+  .trigger-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    margin-top: 6px;
+    flex-shrink: 0;
+  }
+  .trigger-dot.red { background: var(--red-alert); }
+  .trigger-dot.orange { background: var(--orange-warn); }
+  .trigger-dot.gold { background: var(--gold); }
+
+  /* ── EXEC VIEW ── */
+  .exec-hero {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 56px;
+    margin-bottom: 32px;
+    padding: 40px 48px;
+    background: var(--brown);
+    border-radius: 6px;
+    color: var(--cream);
+    position: relative;
+    overflow: hidden;
+  }
+  .exec-hero::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 3px;
+    background: linear-gradient(to right, var(--gold), var(--gold-light), transparent);
+  }
+  .nhs-gauge { text-align: center; }
+  .nhs-score {
+    font-family: 'Playfair Display', serif;
+    font-size: 80px;
+    font-weight: 600;
+    color: var(--gold-light);
+    line-height: 1;
+  }
+  .nhs-label {
+    font-family: 'Playfair Display', serif;
+    font-size: 14px;
+    font-weight: 400;
+    letter-spacing: 1px;
+    color: var(--gold-muted);
+    margin-top: 10px;
+    text-transform: uppercase;
+  }
+  .nhs-sublabel {
+    font-size: 12px;
+    color: var(--olive-light);
+    margin-top: 6px;
+  }
+  .nhs-divider {
+    width: 1px;
+    height: 100px;
+    background: rgba(232,213,163,0.2);
+  }
+  .nhs-breakdown {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .nhs-factor {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .nhs-factor-label {
+    font-size: 13px;
+    width: 150px;
+    color: var(--gold-muted);
+  }
+  .nhs-factor-bar-bg {
+    width: 180px;
+    height: 6px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  .nhs-factor-bar {
+    height: 100%;
+    border-radius: 3px;
+    background: var(--gold);
+    transition: width 0.8s ease;
+  }
+  .nhs-factor-val {
+    font-family: 'Playfair Display', serif;
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--gold-light);
+    width: 36px;
+    text-align: right;
+  }
+
+  .exec-kpis {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 32px;
+  }
+  .kpi-card { padding: 28px; }
+  .kpi-eyebrow {
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 1.8px;
+    color: var(--brown-light);
+    margin-bottom: 10px;
+  }
+  .kpi-value {
+    font-family: 'Playfair Display', serif;
+    font-size: 36px;
+    font-weight: 600;
+    color: var(--brown);
+    line-height: 1.1;
+  }
+  .kpi-context {
+    font-size: 12px;
+    color: var(--brown-light);
+    margin-top: 8px;
+    line-height: 1.5;
+  }
+  .kpi-bar {
+    height: 3px;
+    background: var(--cream-dark);
+    border-radius: 2px;
+    margin-top: 14px;
+    overflow: hidden;
+  }
+  .kpi-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+  }
+
+  .exec-charts {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 20px;
+  }
+  .chart-container { position: relative; height: 230px; }
+
+  /* ── Key Message ── */
+  .key-message {
+    margin-top: 32px;
+    padding: 18px 28px;
+    background: var(--olive-dark);
+    color: var(--cream);
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 400;
+    text-align: center;
+    font-family: 'Playfair Display', serif;
+    font-style: italic;
+    letter-spacing: 0.2px;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 24px 48px;
+    font-size: 11px;
+    color: var(--brown-light);
+    border-top: 1px solid var(--cream-dark);
+    margin-top: 16px;
+  }
+</style>
+</head>
+<body>
+
+<!-- Masthead -->
+<div class="masthead">
+  <div class="masthead-top">
+    <h1>OurRitual <span>&mdash;</span> Expert Network Dashboard</h1>
+    <div class="masthead-meta">
+      <span>Sunday, June 22, 2026</span>
+      <div class="sim-badge">Simulated Data</div>
+    </div>
+  </div>
+  <div class="masthead-rule"></div>
+</div>
+
+<!-- Navigation -->
+<div class="nav-bar">
+  <div class="nav-tab active" onclick="switchView('ops')" id="tab-ops">
+    Operations
+  </div>
+  <div class="nav-tab has-nudge" onclick="switchView('exec')" id="tab-exec">
+    Executive
+    <span class="nudge-inline" id="exec-nudge-inline">&larr; don't miss this</span>
+  </div>
+</div>
+
+<!-- Floating Corner CTA -->
+<div class="exec-float-cta" id="exec-float-cta" onclick="switchView('exec')">
+  <span class="cta-pulse"></span>
+  Executive view
+  <span style="font-size:18px;">&rarr;</span>
+</div>
+
+<!-- ═══════════════ OPS VIEW ═══════════════ -->
+<div class="content">
+<div class="view active" id="ops-view">
+
+  <div class="section-header">Network pulse <em>&mdash; what needs attention right now</em></div>
+
+  <div class="ops-pulse">
+    <div class="card pulse-card pulse-red">
+      <div class="card-label">At risk</div>
+      <div class="pulse-number">7</div>
+      <div class="pulse-label">therapists flagged</div>
+    </div>
+    <div class="card pulse-card pulse-orange">
+      <div class="card-label">In intake</div>
+      <div class="pulse-number">23</div>
+      <div class="pulse-label">onboarding in progress</div>
+    </div>
+    <div class="card pulse-card pulse-green">
+      <div class="card-label">Growth path</div>
+      <div class="pulse-number">158</div>
+      <div class="pulse-label">active &amp; healthy</div>
+    </div>
+  </div>
+
+  <div class="ops-body">
+    <!-- Top 5 -->
+    <div>
+      <div class="section-header">Who needs attention <em>&mdash; top 5</em></div>
+      <div class="therapist-list">
+
+        <div class="therapist-row severity-high">
+          <div class="health-score hs-red">32</div>
+          <div class="therapist-info">
+            <h4>Dr. Noa Levy</h4>
+            <div class="therapist-trigger"><strong>Trigger:</strong> No sessions logged in 14 days. Last login 11 days ago.</div>
+          </div>
+          <div class="therapist-action">Schedule check-in call</div>
+        </div>
+
+        <div class="therapist-row severity-high">
+          <div class="health-score hs-red">38</div>
+          <div class="therapist-info">
+            <h4>Yael Berkowitz</h4>
+            <div class="therapist-trigger"><strong>Trigger:</strong> 3 couple cancellations this week. Satisfaction score dropped 22%.</div>
+          </div>
+          <div class="therapist-action">Review couple feedback</div>
+        </div>
+
+        <div class="therapist-row severity-med">
+          <div class="health-score hs-orange">51</div>
+          <div class="therapist-info">
+            <h4>Dr. Amit Shapira</h4>
+            <div class="therapist-trigger"><strong>Trigger:</strong> Onboarding incomplete &mdash; stuck at clinical calibration (Day 19).</div>
+          </div>
+          <div class="therapist-action">Assign onboarding buddy</div>
+        </div>
+
+        <div class="therapist-row severity-med">
+          <div class="health-score hs-orange">55</div>
+          <div class="therapist-info">
+            <h4>Tamar Goldman</h4>
+            <div class="therapist-trigger"><strong>Trigger:</strong> Recording opt-out rate 80%. Only 1 of 5 sessions recorded.</div>
+          </div>
+          <div class="therapist-action">Send trust-building guide</div>
+        </div>
+
+        <div class="therapist-row severity-low">
+          <div class="health-score hs-yellow">62</div>
+          <div class="therapist-info">
+            <h4>Dr. Oren Ben-David</h4>
+            <div class="therapist-trigger"><strong>Trigger:</strong> Revenue declining 3 consecutive months. Down from 12 to 7 active couples.</div>
+          </div>
+          <div class="therapist-action">Propose growth plan</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Right column -->
+    <div>
+      <div class="section-header">Journey distribution</div>
+      <div class="card" style="margin-bottom: 20px;">
+        <div class="journey-segment">
+          <div class="journey-label">Intake</div>
+          <div class="journey-bar-bg">
+            <div class="journey-bar-fill intake" style="width: 12%;">23</div>
+          </div>
+        </div>
+        <div class="journey-segment">
+          <div class="journey-label">Growth Path</div>
+          <div class="journey-bar-bg">
+            <div class="journey-bar-fill growth" style="width: 79%;">158</div>
+          </div>
+        </div>
+        <div class="journey-segment">
+          <div class="journey-label">Retention</div>
+          <div class="journey-bar-bg">
+            <div class="journey-bar-fill retention" style="width: 6%;">12</div>
+          </div>
+        </div>
+        <div class="journey-segment">
+          <div class="journey-label">At Risk</div>
+          <div class="journey-bar-bg">
+            <div class="journey-bar-fill at-risk" style="width: 3.5%;">7</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section-header">Recent proactive triggers</div>
+      <div class="card">
+        <div class="trigger-item">
+          <div class="trigger-time">08:02</div>
+          <div class="trigger-dot red"></div>
+          <div><strong>Dr. Noa Levy</strong> &mdash; 14-day inactivity threshold crossed</div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-time">07:45</div>
+          <div class="trigger-dot orange"></div>
+          <div><strong>Tamar Goldman</strong> &mdash; Recording opt-out rate exceeded 75%</div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-time">07:30</div>
+          <div class="trigger-dot orange"></div>
+          <div><strong>Dr. Amit Shapira</strong> &mdash; Onboarding stall: no progress in 5 days</div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-time">Yesterday</div>
+          <div class="trigger-dot gold"></div>
+          <div><strong>Shira Katz</strong> &mdash; Completed 50th session milestone (auto-recognition sent)</div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-time">Yesterday</div>
+          <div class="trigger-dot red"></div>
+          <div><strong>Yael Berkowitz</strong> &mdash; Couple satisfaction dropped below 70%</div>
+        </div>
+        <div class="trigger-item">
+          <div class="trigger-time">Jun 20</div>
+          <div class="trigger-dot gold"></div>
+          <div><strong>Dr. Miri Adler</strong> &mdash; Moved from Intake to Growth Path (Day 21)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="key-message">
+    The ops team opens this every morning and knows exactly what to do &mdash; in 10 seconds.
+  </div>
+
+</div>
+
+<!-- ═══════════════ EXEC VIEW ═══════════════ -->
+<div class="view" id="exec-view">
+
+  <div class="section-header">Network Health Score <em>&mdash; composite view</em></div>
+
+  <!-- Hero -->
+  <div class="exec-hero">
+    <div class="nhs-gauge">
+      <div class="nhs-score">74</div>
+      <div class="nhs-label">Network Health Score</div>
+      <div class="nhs-sublabel">+3 pts from last month</div>
+    </div>
+    <div class="nhs-divider"></div>
+    <div class="nhs-breakdown">
+      <div class="nhs-factor">
+        <div class="nhs-factor-label">Clinical Quality</div>
+        <div class="nhs-factor-bar-bg"><div class="nhs-factor-bar" style="width:82%"></div></div>
+        <div class="nhs-factor-val">82</div>
+      </div>
+      <div class="nhs-factor">
+        <div class="nhs-factor-label">Engagement</div>
+        <div class="nhs-factor-bar-bg"><div class="nhs-factor-bar" style="width:71%"></div></div>
+        <div class="nhs-factor-val">71</div>
+      </div>
+      <div class="nhs-factor">
+        <div class="nhs-factor-label">Retention Rate</div>
+        <div class="nhs-factor-bar-bg"><div class="nhs-factor-bar" style="width:78%"></div></div>
+        <div class="nhs-factor-val">78</div>
+      </div>
+      <div class="nhs-factor">
+        <div class="nhs-factor-label">Platform Adoption</div>
+        <div class="nhs-factor-bar-bg"><div class="nhs-factor-bar" style="width:64%"></div></div>
+        <div class="nhs-factor-val">64</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPIs -->
+  <div class="section-header">Expert lifecycle economics</div>
+  <div class="exec-kpis">
+    <div class="card kpi-card">
+      <div class="kpi-eyebrow">Therapist LTV vs. CAC</div>
+      <div class="kpi-value">4.2x</div>
+      <div class="kpi-context">LTV $18,400 &middot; CAC $4,380</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:84%;background:var(--olive);"></div></div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-eyebrow">Revenue per Expert (ARPE)</div>
+      <div class="kpi-value">$2,840</div>
+      <div class="kpi-context">Monthly average &middot; Break-even: $1,950</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:68%;background:var(--gold);"></div></div>
+    </div>
+    <div class="card kpi-card">
+      <div class="kpi-eyebrow">Cost of Churn</div>
+      <div class="kpi-value">$31K</div>
+      <div class="kpi-context">Replacement $8K + lost couples revenue $23K</div>
+      <div class="kpi-bar"><div class="kpi-bar-fill" style="width:62%;background:var(--red-alert);"></div></div>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="section-header">Risk &amp; correlation <em>&mdash; where to look</em></div>
+  <div class="exec-charts">
+    <div class="card">
+      <div class="card-label">Concentration risk</div>
+      <div style="text-align:center; margin-bottom:10px;">
+        <span style="font-family:'Playfair Display',serif; font-size:24px; font-weight:600; color:var(--red-alert);">5%</span>
+        <span style="font-size:13px; color:var(--brown-light);"> of experts generate </span>
+        <span style="font-family:'Playfair Display',serif; font-size:24px; font-weight:600; color:var(--red-alert);">38%</span>
+        <span style="font-size:13px; color:var(--brown-light);"> of revenue</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="concentrationChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Quality &rarr; Retention correlation</div>
+      <div style="text-align:center; margin-bottom:10px;">
+        <span style="font-size:13px; color:var(--brown-light);">Higher clinical quality = longer tenure</span>
+        <span style="font-family:'Playfair Display',serif; font-size:16px; font-weight:600; color:var(--olive); margin-left:8px;">r = 0.81</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="qualityRetentionChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-top:32px;">Trends <em>&mdash; are we getting better?</em></div>
+  <div class="exec-charts">
+    <div class="card">
+      <div class="card-label">ARPE trend + break-even</div>
+      <div class="chart-container">
+        <canvas id="arpeChart"></canvas>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-label">Time-to-productivity</div>
+      <div style="text-align:center; margin-bottom:6px;">
+        <span style="font-size:12px; color:var(--brown-light);">Days until a new therapist reaches 5 active couples</span>
+      </div>
+      <div class="chart-container">
+        <canvas id="ttpChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="key-message">
+    Leadership gets real-time visibility into the health and economics of the entire network.
+  </div>
+
+</div>
+</div>
+
+<div class="footer">
+  OurRitual Expert Network Dashboard &middot; Simulation for strategic planning purposes &middot; Data is illustrative, not real.
+</div>
+
+<script>
+// ── Tab Switching ──
+let nudgeDismissed = false;
+
+function dismissNudges() {
+  if (nudgeDismissed) return;
+  nudgeDismissed = true;
+
+  // Remove tab glow
+  const tab = document.getElementById('tab-exec');
+  tab.classList.remove('has-nudge');
+
+  // Hide inline nudge text
+  const inline = document.getElementById('exec-nudge-inline');
+  if (inline) inline.style.display = 'none';
+
+  // Hide floating CTA
+  const floatCta = document.getElementById('exec-float-cta');
+  if (floatCta) floatCta.classList.add('hidden');
+}
+
+function switchView(view) {
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+
+  if (view === 'ops') {
+    document.getElementById('tab-ops').classList.add('active');
+    document.getElementById('ops-view').classList.add('active');
+  } else {
+    document.getElementById('tab-exec').classList.add('active');
+    document.getElementById('exec-view').classList.add('active');
+    renderCharts();
+    dismissNudges();
+  }
+}
+
+// ── Chart.js Defaults ──
+Chart.defaults.font.family = "'Inter', sans-serif";
+Chart.defaults.font.size = 12;
+Chart.defaults.color = '#8A7D6E';
+
+let chartsRendered = false;
+
+function renderCharts() {
+  if (chartsRendered) return;
+  chartsRendered = true;
+
+  // Concentration Risk
+  new Chart(document.getElementById('concentrationChart'), {
+    type: 'bar',
+    data: {
+      labels: ['Top 5%', '6–20%', '21–50%', '51–80%', '81–100%'],
+      datasets: [{
+        data: [38, 28, 20, 10, 4],
+        backgroundColor: ['#B33A2B', '#C47028', '#C4973B', '#8A9B6A', '#5C6B3C'],
+        borderRadius: 3,
+        barThickness: 40,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { ticks: { callback: v => v + '%' }, grid: { color: '#F0E8D4' }, max: 50, border: { display: false } },
+        x: { grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+
+  // Quality → Retention
+  const scatterData = [];
+  const rng = (seed) => { let s = seed; return () => { s = (s * 16807) % 2147483647; return s / 2147483647; }; };
+  const rand = rng(42);
+  for (let i = 0; i < 55; i++) {
+    const quality = 35 + rand() * 60;
+    const tenure = quality * 0.38 + (rand() - 0.5) * 14 + 3;
+    scatterData.push({ x: Math.round(quality), y: Math.round(Math.max(2, tenure)) });
+  }
+  new Chart(document.getElementById('qualityRetentionChart'), {
+    type: 'scatter',
+    data: {
+      datasets: [{
+        data: scatterData,
+        backgroundColor: 'rgba(92,107,60,0.55)',
+        borderColor: 'rgba(92,107,60,0.7)',
+        pointRadius: 5,
+        pointHoverRadius: 7,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { title: { display: true, text: 'Clinical Quality Score', color: '#8A7D6E' }, min: 30, max: 100, grid: { color: '#F0E8D4' }, border: { display: false } },
+        y: { title: { display: true, text: 'Tenure (months)', color: '#8A7D6E' }, min: 0, max: 45, grid: { color: '#F0E8D4' }, border: { display: false } }
+      }
+    }
+  });
+
+  // ARPE Trend
+  new Chart(document.getElementById('arpeChart'), {
+    type: 'line',
+    data: {
+      labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+      datasets: [{
+        label: 'ARPE',
+        data: [2320, 2480, 2550, 2690, 2780, 2840],
+        borderColor: '#5C6B3C',
+        backgroundColor: 'rgba(92,107,60,0.08)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 5,
+        pointBackgroundColor: '#5C6B3C',
+        borderWidth: 2,
+      }, {
+        label: 'Break-even',
+        data: [1950, 1950, 1950, 1950, 1950, 1950],
+        borderColor: '#B33A2B',
+        borderDash: [6, 4],
+        borderWidth: 1.5,
+        pointRadius: 0,
+        fill: false,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { position: 'bottom', labels: { usePointStyle: true, padding: 20, font: { size: 11 } } } },
+      scales: {
+        y: { ticks: { callback: v => '$' + v.toLocaleString() }, grid: { color: '#F0E8D4' }, min: 1500, max: 3200, border: { display: false } },
+        x: { grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+
+  // Time-to-Productivity
+  new Chart(document.getElementById('ttpChart'), {
+    type: 'line',
+    data: {
+      labels: ["Q3 '25", "Q4 '25", "Q1 '26", "Q2 '26"],
+      datasets: [{
+        data: [42, 36, 29, 23],
+        borderColor: '#C4973B',
+        backgroundColor: 'rgba(196,151,59,0.08)',
+        fill: true,
+        tension: 0.35,
+        pointRadius: 6,
+        pointBackgroundColor: '#C4973B',
+        borderWidth: 2,
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: { title: { display: true, text: 'Days', color: '#8A7D6E' }, grid: { color: '#F0E8D4' }, min: 10, max: 50, border: { display: false } },
+        x: { grid: { display: false }, border: { display: false } }
+      }
+    }
+  });
+}
+</script>
+</body>
+</html>
